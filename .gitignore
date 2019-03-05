@@ -1,0 +1,9 @@
+*.o
+*.so
+*.pyc
+*~
+.idea
+*.trie
+*.pickle
+*.h5
+dist/
