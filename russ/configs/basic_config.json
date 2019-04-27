@@ -1,0 +1,48 @@
+{
+  "reader": {
+    "type": "stress"
+  },
+  "model": {
+    "type": "base",
+    "embedder": {
+      "type": "basic",
+      "token_embedders": {
+        "tokens": {
+          "type": "embedding",
+          "embedding_dim": 16
+        }
+      }
+    },
+    "encoder": {
+      "type": "lstm",
+      "num_layers": 1,
+      "input_size": 16,
+      "hidden_size": 32,
+      "bidirectional": true
+    }
+  },
+  "train": {
+    "iterator": {
+      "type": "bucket",
+      "batch_size": 128,
+      "padding_noise": 0.0,
+      "sorting_keys": [
+        [
+          "tokens",
+          "num_tokens"
+        ]
+      ],
+      "cache_instances": false
+    },
+    "trainer": {
+      "grad_clipping": 5.0,
+      "patience": 1,
+      "num_epochs": 50,
+      "optimizer": {
+        "type": "adam",
+        "lr": 0.001
+      },
+      "shuffle": false
+    }
+  }
+}

@@ -6,3 +6,6 @@ RU_WIKTIONARY_DICT = os.path.join(DATA_DIR, "ru_wiki.txt")
 RU_INFLECTED_DICT = os.path.join(DATA_DIR, "ru_inflected.txt")
 RU_CUSTOM_DICT = os.path.join(DATA_DIR, "ru_custom.txt")
 RU_ALL_DICT = os.path.join(DATA_DIR, "ru_all.txt")
+
+CONFIGS_DIR = resource_filename(__name__, "configs")
+BASIC_CONFIG = os.path.join(CONFIGS_DIR, "base_config.json")

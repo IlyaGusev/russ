@@ -2,7 +2,7 @@ import unittest
 import os
 from tempfile import NamedTemporaryFile
 
-from russ.stress_model.stress_reader import StressReader
+from russ.stress.reader import StressReader
 
 
 class TestStressReader(unittest.TestCase):

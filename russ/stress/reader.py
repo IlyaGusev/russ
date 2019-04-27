@@ -1,4 +1,3 @@
-
 from typing import Dict, List, Iterable
 
 from allennlp.common.file_utils import cached_path
@@ -17,7 +16,7 @@ class StressReader(DatasetReader):
     def __init__(self,
                  token_indexers: Dict[str, TokenIndexer] = None,
                  tokenizer: Tokenizer = None,) -> None:
-        super().__init__()
+        super().__init__(lazy=True)
 
         self._tokenizer = tokenizer or CharacterTokenizer()
         self._token_indexers = token_indexers or {"tokens": SingleIdTokenIndexer()}
@@ -59,7 +58,7 @@ class StressReader(DatasetReader):
         result = dict()
         result['tokens'] = TextField(sample, self._token_indexers)
         if schema:
-            result['labels'] = SequenceLabelField(labels=list(map(str, schema)), sequence_field=result['tokens'])
+            result['tags'] = SequenceLabelField(labels=list(map(str, schema)), sequence_field=result['tokens'])
         return Instance(result)
 
     @staticmethod
