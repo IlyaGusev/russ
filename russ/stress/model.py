@@ -1,5 +1,7 @@
 import os
 import logging
+from enum import Enum
+
 import torch
 from allennlp.data.dataset_readers import DatasetReader
 from allennlp.common.params import Params
@@ -11,11 +13,17 @@ from allennlp.training.trainer import Trainer
 
 from russ.stress.reader import StressReader
 from russ.stress.predictor import StressPredictor
+from russ.syllables import get_first_vowel_position, get_syllables
 
 logger = logging.getLogger(__name__)
 
 
 class StressModel(Registrable):
+
+    class PredictSchema(Enum):
+        LOCAL = 0
+        GLOBAL = 1
+
     def __init__(self,
                  model: Model,
                  vocab: Vocabulary,
@@ -42,14 +50,20 @@ class StressModel(Registrable):
         train_params.assert_empty("Trainer")
         return trainer.train()
 
-    def predict_word_stress(self, word: str):
+    def predict_word_stress(self, word: str, schema: PredictSchema = PredictSchema.GLOBAL):
         self.model.eval()
+        syllables = get_syllables(word)
+        if len(syllables) <= 1:
+            return [] if get_first_vowel_position(word) == -1 else [get_first_vowel_position(word)]
         predictor = StressPredictor(self.model, dataset_reader=self.reader)
         logits = predictor.predict(word)['logits']
-        probabilities = torch.nn.Softmax(dim=1)(torch.Tensor(logits))
-        _, indices = probabilities[1:-1].max(dim=1)
-        indices = indices.cpu().tolist()
-        return [i for i, stress_type in enumerate(indices) if stress_type == 1]
+        probabilities = torch.nn.Softmax(dim=1)(torch.Tensor(logits))[1:-1]
+        if schema == StressModel.PredictSchema.LOCAL:
+            stresses = probabilities.max(dim=1)[1].cpu().tolist()
+            return [i for i, stress_type in enumerate(stresses) if stress_type == 1]
+        elif schema == StressModel.PredictSchema.GLOBAL:
+            stress = probabilities[:, 1].max(dim=0)[1].cpu().item()
+            return [stress]
 
     def log_model(self):
         logger.info(self.model)
