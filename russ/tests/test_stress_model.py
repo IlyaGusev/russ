@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
-# Автор: Гусев Илья
-# Описание: Тесты предсказателя ударений.
+# Author: Ilya Gusev
+# Description: Stress model predictions test
 
 import unittest
-import os
-
-from allennlp.common.params import Params
-from allennlp.models import Model
 
 from russ.stress.model import StressModel
+from russ.settings import RU_MAIN_MODEL
 
 
 class TestStressPredictor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        model_path = "/media/yallen/My Passport/Projects/russ/models/big"
-        cls.model = StressModel.load(model_path)
+        cls.model = StressModel.load(RU_MAIN_MODEL)
 
     def test_stress(self):
         checks = {
@@ -32,9 +28,7 @@ class TestStressPredictor(unittest.TestCase):
             'оттечь': [3],
             'советского': [3],
             'союза': [2],
-            # 'пора': [3, 1],
             'изжила': [5],
-            'меда': [1],
             'автоподъёмник': [8],
             'каракуля': [3],
             'супервайзер': [6],

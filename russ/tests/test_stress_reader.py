@@ -12,6 +12,12 @@ class TestStressReader(unittest.TestCase):
         file.write("прищу'чу\nперемеша'ют\nдуше`внобольны'х\nэлектро`н-во'льтом")
         file.close()
         dataset = reader.read(file.name)
+        labels = [
+            ['0', '0', '0', '0', '0', '1', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0'],
+            ['0', '0', '0', '0', '2', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '2', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0'],
+        ]
+        for l, sample in zip(labels, dataset):
+            self.assertListEqual(sample["tags"].labels, l)
         os.unlink(file.name)
-        for sample in dataset:
-            print(sample)

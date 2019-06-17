@@ -5,14 +5,15 @@ setup(
     name='russ',
     packages=find_packages(),
     version='0.0.1',
-    description='Russ',
+    description='Russian words stress detection',
     author='Ilya Gusev',
     author_email='phoenixilya@gmail.com',
     url='https://github.com/IlyaGusev/russ',
     download_url='https://github.com/IlyaGusev/russ/archive/0.0.1.tar.gz',
-    keywords=['poetry', 'nlp', 'russian'],
+    keywords=['nlp', 'russian', 'recurrent neural networks'],
     install_requires=[
-
+        'torch>=1.0.0',
+        'allennlp>=0.8.2'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',

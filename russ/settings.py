@@ -1,11 +1,8 @@
 import os
 from pkg_resources import resource_filename
 
-DATA_DIR = resource_filename(__name__, "data")
-RU_WIKTIONARY_DICT = os.path.join(DATA_DIR, "ru_wiki.txt")
-RU_INFLECTED_DICT = os.path.join(DATA_DIR, "ru_inflected.txt")
-RU_CUSTOM_DICT = os.path.join(DATA_DIR, "ru_custom.txt")
-RU_ALL_DICT = os.path.join(DATA_DIR, "ru_all.txt")
+MODELS_DIR = resource_filename(__name__, "models")
+RU_MAIN_MODEL = os.path.join(MODELS_DIR, "ru-main")
 
 CONFIGS_DIR = resource_filename(__name__, "configs")
 BASIC_CONFIG = os.path.join(CONFIGS_DIR, "base_config.json")

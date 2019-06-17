@@ -1,8 +1,10 @@
 import os
 import logging
 from enum import Enum
+from typing import List
 
-import torch
+from torch.nn.functional import softmax
+from torch import Tensor
 from allennlp.data.dataset_readers import DatasetReader
 from allennlp.common.params import Params
 from allennlp.common.registrable import Registrable
@@ -11,7 +13,6 @@ from allennlp.models import Model
 from allennlp.data.iterators import DataIterator
 from allennlp.training.trainer import Trainer
 
-from russ.stress.reader import StressReader
 from russ.stress.predictor import StressPredictor
 from russ.syllables import get_first_vowel_position, get_syllables
 
@@ -21,8 +22,8 @@ logger = logging.getLogger(__name__)
 class StressModel(Registrable):
 
     class PredictSchema(Enum):
-        LOCAL = 0
-        GLOBAL = 1
+        CLASSIC = 0
+        CONSTRAINED = 1
 
     def __init__(self,
                  model: Model,
@@ -50,25 +51,28 @@ class StressModel(Registrable):
         train_params.assert_empty("Trainer")
         return trainer.train()
 
-    def predict_word_stress(self, word: str, schema: PredictSchema = PredictSchema.GLOBAL):
+    def predict_words_stresses(self, words: List[str], schema: PredictSchema = PredictSchema.CONSTRAINED):
         self.model.eval()
-        syllables = get_syllables(word)
-        if len(syllables) <= 1:
-            return [] if get_first_vowel_position(word) == -1 else [get_first_vowel_position(word)]
         predictor = StressPredictor(self.model, dataset_reader=self.reader)
-        logits = predictor.predict(word)['logits']
-        probabilities = torch.nn.Softmax(dim=1)(torch.Tensor(logits))[1:-1]
-        if schema == StressModel.PredictSchema.LOCAL:
-            stresses = probabilities.max(dim=1)[1].cpu().tolist()
-            return [i for i, stress_type in enumerate(stresses) if stress_type == 1]
-        elif schema == StressModel.PredictSchema.GLOBAL:
-            stress = probabilities[:, 1].max(dim=0)[1].cpu().item()
-            return [stress]
+        batch = [{"word": word} for word in words]
+        results = predictor.predict_batch_json(batch)
+        stresses = {}
+        for word, result in zip(words, results):
+            syllables = get_syllables(word)
+            logits = result['logits']
+            probabilities = softmax(Tensor(logits), dim=1)[1:-1]
+            if len(syllables) <= 1:
+                stresses[word] = [] if get_first_vowel_position(word) == -1 else [get_first_vowel_position(word)]
+            elif schema == StressModel.PredictSchema.CLASSIC:
+                classes = probabilities.max(dim=1)[1].cpu().tolist()[:len(word)]
+                stresses[word] = [i for i, stress_type in enumerate(classes) if stress_type == 1]
+            elif schema == StressModel.PredictSchema.CONSTRAINED:
+                stress = probabilities[:, 1].max(dim=0)[1].cpu().item()
+                stresses[word] = [stress]
+        return stresses
 
-    def log_model(self):
-        logger.info(self.model)
-        params_count = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
-        logger.info("Trainable params count: " + str(params_count))
+    def predict_word_stress(self, word: str, schema: PredictSchema = PredictSchema.CONSTRAINED):
+        return self.predict_words_stresses([word], schema)[word]
 
     @classmethod
     def load(cls,
@@ -99,3 +103,8 @@ class StressModel(Registrable):
         model = StressModel.from_params(params, model=inner_model, vocab=vocab, **kwargs)
 
         return model
+
+    def __str__(self):
+        s = str(self.model) + "\n"
+        s += "Trainable params count: {}".format(sum(p.numel() for p in self.model.parameters()if p.requires_grad))
+        return s
