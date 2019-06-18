@@ -35,6 +35,6 @@ class TestStressPredictor(unittest.TestCase):
             'колесом': [5]
         }
         for word, pos in checks.items():
-            predicted = list(sorted(self.model.predict_word_stress(word)))
+            predicted = list(sorted(self.model.predict(word)))
             target = list(sorted(pos))
             self.assertEqual(predicted, target, msg="{}: {} vs {}".format(word, predicted, target))

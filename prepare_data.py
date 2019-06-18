@@ -1,10 +1,46 @@
 import argparse
 import random
 import unicodedata
+from collections import defaultdict
 
 from russ.parsers.inflected_stress import parse as parse_inflected_stress
 from russ.parsers.inflected_stress import parse_lexemes
 from russ.parsers.wiki_stress import parse as parse_wiki_stress
+from russ.stress.reader import StressReader
+
+
+def merge_forms(words):
+    clean_to_marked = defaultdict(set)
+    for word in words:
+        word = word.replace("ё'", "ё").replace("ё", "ё'")
+        clean_word = word.replace(chr(39), "").replace(chr(96), "")
+        if not word or word == clean_word or word[0] in (chr(39), chr(96), '-'):
+            continue
+        clean_to_marked[clean_word].add(word)
+    words = []
+    reader = StressReader()
+    for clean_word, variants in clean_to_marked.items():
+        if len(variants) == 1:
+            words.append(variants.pop())
+            continue
+        primary = set()
+        secondary = set()
+        for word in variants:
+            schema = list(map(int, reader.text_to_instance(word)["tags"].labels))
+            primary |= {i-1 for i, stress in enumerate(schema) if stress == 1}
+            secondary |= {i-1 for i, stress in enumerate(schema) if stress == 2}
+        secondary = secondary - primary
+        if not primary and not secondary:
+            continue
+        word = ""
+        for i, ch in enumerate(clean_word):
+            word += ch
+            if i in primary:
+                word += chr(39)
+            elif i in secondary:
+                word += chr(96)
+        words.append(word)
+    return words
 
 
 def prepare(wiktionary_dump_path: str,
@@ -41,7 +77,7 @@ def prepare(wiktionary_dump_path: str,
                     word = unicodedata.normalize('NFKC', word.strip())
                     words.add(word.strip())
 
-    words = list(words)
+    words = merge_forms(words)
     if lower:
         words = list(map(str.lower, words))
         lexemes = map(lambda x: map(str.lower, x), lexemes)
@@ -71,10 +107,8 @@ def prepare(wiktionary_dump_path: str,
 
         if not split_lexemes:
             for word in words:
-                if not word or word[0] in (chr(39), chr(96), '-'):
-                    continue
-                choose_file(count).write(word.strip() + "\n")
                 count += 1
+                choose_file(count).write(word.strip() + "\n")
         else:
             for lexeme in lexemes:
                 for word in lexeme:

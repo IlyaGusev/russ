@@ -15,6 +15,8 @@ from allennlp.training.trainer import Trainer
 
 from russ.stress.predictor import StressPredictor
 from russ.syllables import get_first_vowel_position, get_syllables
+from russ.settings import RU_MAIN_MODEL
+from russ.stress.dict import StressDict, Stress
 
 logger = logging.getLogger(__name__)
 
@@ -28,11 +30,13 @@ class StressModel(Registrable):
     def __init__(self,
                  model: Model,
                  vocab: Vocabulary,
-                 reader: DatasetReader = None) -> None:
+                 reader: DatasetReader = None,
+                 stress_dict: StressDict = None):
         super().__init__()
         self.reader = reader
         self.vocab = vocab
         self.model = model
+        self.stress_dict = stress_dict
 
     def train_file(self,
                    train_file_name: str,
@@ -52,18 +56,27 @@ class StressModel(Registrable):
         return trainer.train()
 
     def predict_words_stresses(self, words: List[str], schema: PredictSchema = PredictSchema.CONSTRAINED):
-        self.model.eval()
-        predictor = StressPredictor(self.model, dataset_reader=self.reader)
-        batch = [{"word": word} for word in words]
-        results = predictor.predict_batch_json(batch)
         stresses = {}
-        for word, result in zip(words, results):
+        for word in words:
             syllables = get_syllables(word)
-            logits = result['logits']
-            probabilities = softmax(Tensor(logits), dim=1)[1:-1]
             if len(syllables) <= 1:
                 stresses[word] = [] if get_first_vowel_position(word) == -1 else [get_first_vowel_position(word)]
-            elif schema == StressModel.PredictSchema.CLASSIC:
+                continue
+
+            dict_record = self.stress_dict.get(word, Stress.Type.PRIMARY) if self.stress_dict is not None else None
+            if dict_record is not None:
+                stresses[word] = dict_record
+
+        batch = [{"word": word} for word in words if word not in stresses]
+        if not batch:
+            return stresses
+        self.model.eval()
+        predictor = StressPredictor(self.model, dataset_reader=self.reader)
+        results = predictor.predict_batch_json(batch)
+        for word, result in zip(words, results):
+            logits = result['logits']
+            probabilities = softmax(Tensor(logits), dim=1)[1:-1]
+            if schema == StressModel.PredictSchema.CLASSIC:
                 classes = probabilities.max(dim=1)[1].cpu().tolist()[:len(word)]
                 stresses[word] = [i for i, stress_type in enumerate(classes) if stress_type == 1]
             elif schema == StressModel.PredictSchema.CONSTRAINED:
@@ -71,15 +84,16 @@ class StressModel(Registrable):
                 stresses[word] = [stress]
         return stresses
 
-    def predict_word_stress(self, word: str, schema: PredictSchema = PredictSchema.CONSTRAINED):
+    def predict(self, word: str, schema: PredictSchema = PredictSchema.CONSTRAINED):
         return self.predict_words_stresses([word], schema)[word]
 
     @classmethod
     def load(cls,
-             serialization_dir: str,
+             serialization_dir: str = RU_MAIN_MODEL,
              params_file: str = None,
              weights_file: str = None,
              vocabulary_dir: str = None,
+             stress_dict_path: str = None,
              cuda_device: int = -1,
              **kwargs) -> 'StressModel':
         params_file = params_file or os.path.join(serialization_dir, "config.json")
@@ -100,11 +114,21 @@ class StressModel(Registrable):
         params.pop('model')
         if params.get('vocabulary', None):
             params.pop('vocabulary')
-        model = StressModel.from_params(params, model=inner_model, vocab=vocab, **kwargs)
+
+        stress_dict = None
+        if stress_dict_path:
+            stress_dict = StressDict()
+            stress_dict.load(stress_dict_path)
+
+        model = StressModel.from_params(params, model=inner_model, vocab=vocab, stress_dict=stress_dict, **kwargs)
 
         return model
 
     def __str__(self):
         s = str(self.model) + "\n"
-        s += "Trainable params count: {}".format(sum(p.numel() for p in self.model.parameters()if p.requires_grad))
+        s += "Trainable params count: {}\n".format(sum(p.numel() for p in self.model.parameters()if p.requires_grad))
+        if self.stress_dict is None:
+            s += "No stress dictionary"
+        else:
+            s += "{} words in stress dictionary".format(len(self.stress_dict))
         return s
