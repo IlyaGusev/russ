@@ -13,7 +13,9 @@ setup(
     keywords=['nlp', 'russian', 'recurrent neural networks'],
     install_requires=[
         'torch>=1.0.0',
-        'allennlp>=0.8.2'
+        'allennlp>=0.8.2',
+        'pytest-cov>=2.6.1',
+        'codecov>=2.0.15'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
