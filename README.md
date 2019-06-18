@@ -1,5 +1,9 @@
 # Python library for word stress detection #
 
+[![Build Status](https://travis-ci.org/IlyaGusev/russ.svg?branch=master)](https://travis-ci.org/IlyaGusev/russ)
+[![Code Climate](https://codeclimate.com/github/IlyaGusev/russ/badges/gpa.svg)](https://codeclimate.com/github/IlyaGusev/russ)
+[![codecov](https://codecov.io/gh/IlyaGusev/russ/branch/master/graph/badge.svg)](https://codecov.io/gh/IlyaGusev/russ)
+
 ### Install
 ```
 pip install russ
@@ -10,6 +14,7 @@ or
 ```
 git clone https://github.com/IlyaGusev/russ
 cd russ
+git lfs pull
 pip install -r requirements.txt
 python setup.py
 ```
