@@ -27,7 +27,7 @@
   "train": {
     "iterator": {
       "type": "bucket",
-      "batch_size": 64,
+      "batch_size": 128,
       "padding_noise": 0.0,
       "sorting_keys": [
         [

@@ -7,7 +7,7 @@ from russ.parsers.inflected_stress import parse as parse_inflected_stress
 from russ.parsers.inflected_stress import parse_lexemes
 from russ.parsers.wiki_stress import parse as parse_wiki_stress
 from russ.stress.reader import StressReader
-
+from russ.syllables import VOWELS
 
 def merge_forms(words):
     clean_to_marked = defaultdict(set)
@@ -19,10 +19,8 @@ def merge_forms(words):
         clean_to_marked[clean_word].add(word)
     words = []
     reader = StressReader()
+    vowels = set(VOWELS)
     for clean_word, variants in clean_to_marked.items():
-        if len(variants) == 1:
-            words.append(variants.pop())
-            continue
         primary = set()
         secondary = set()
         for word in variants:
@@ -33,13 +31,16 @@ def merge_forms(words):
         if not primary and not secondary:
             continue
         word = ""
+        count_primary = 0
         for i, ch in enumerate(clean_word):
             word += ch
-            if i in primary:
+            if i in primary and word[-1] in vowels:
                 word += chr(39)
-            elif i in secondary:
+                count_primary += 1
+            elif i in secondary and word[-1] in vowels:
                 word += chr(96)
-        words.append(word)
+        if count_primary != 0:
+            words.append(word)
     return words
 
 

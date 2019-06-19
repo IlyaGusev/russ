@@ -26,6 +26,8 @@ class TestStressPredictor(unittest.TestCase):
             'зорька': [1],
             'банка': [1],
             'оттечь': [3],
+            'пора': [1, 3],
+            'меда': [1, 3],
             'советского': [3],
             'союза': [2],
             'изжила': [5],
@@ -35,6 +37,6 @@ class TestStressPredictor(unittest.TestCase):
             'колесом': [5]
         }
         for word, pos in checks.items():
-            predicted = list(sorted(self.model.predict(word)))
+            predicted = list(sorted(self.model.predict(word, schema=StressModel.PredictSchema.CLASSIC)))
             target = list(sorted(pos))
             self.assertEqual(predicted, target, msg="{}: {} vs {}".format(word, predicted, target))

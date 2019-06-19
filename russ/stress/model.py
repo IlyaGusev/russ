@@ -73,11 +73,12 @@ class StressModel(Registrable):
         self.model.eval()
         predictor = StressPredictor(self.model, dataset_reader=self.reader)
         results = predictor.predict_batch_json(batch)
-        for word, result in zip(words, results):
+        for word, result in zip(batch, results):
+            word = word["word"]
             logits = result['logits']
-            probabilities = softmax(Tensor(logits), dim=1)[1:-1]
+            probabilities = softmax(Tensor(logits), dim=1)[1:len(word)+1]
             if schema == StressModel.PredictSchema.CLASSIC:
-                classes = probabilities.max(dim=1)[1].cpu().tolist()[:len(word)]
+                classes = probabilities.max(dim=1)[1].cpu().tolist()
                 stresses[word] = [i for i, stress_type in enumerate(classes) if stress_type == 1]
             elif schema == StressModel.PredictSchema.CONSTRAINED:
                 stress = probabilities[:, 1].max(dim=0)[1].cpu().item()
