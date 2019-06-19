@@ -21,7 +21,14 @@ python setup.py
 
 ### Usage
 
+```
+from russ.stress.model import StressModel
 
+model = StressModel.load()
+model.predict("корова")
+
+>>> [3]
+```
 
 ### Commands
 

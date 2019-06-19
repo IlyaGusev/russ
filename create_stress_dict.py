@@ -20,11 +20,8 @@ def create_dict(files, output):
 
 
 if __name__ == "__main__":
-    #parser = argparse.ArgumentParser()
-    #parser.add_argument('files',  nargs='*')
-    #parser.add_argument('--output', required=True)
-    #args = parser.parse_args()
-    #create_dict(**vars(args))
-    stress_dict = StressDict()
-    stress_dict.load("stress_dict.pickle")
-    print(stress_dict.get("возлёгшему", Stress.Type.PRIMARY))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('files',  nargs='*')
+    parser.add_argument('--output', required=True)
+    args = parser.parse_args()
+    create_dict(**vars(args))
