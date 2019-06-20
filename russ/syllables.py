@@ -7,7 +7,7 @@ CLOSED_SYLLABLE_CHARS = "рлймнРЛЙМН"
 def get_first_vowel_position(string):
     for i, ch in enumerate(string):
         if ch in VOWELS:
-            return i;
+            return i
     return -1
 
 

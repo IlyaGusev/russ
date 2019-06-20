@@ -23,6 +23,7 @@ class WordErrorRate:
     def __str__(self):
         return "WER: {0:.2f}".format(100.*(1.0 - self.correct/float(self.all) if self.all != 0 else 0.))
 
+
 def process_batch(batch, model, mode):
     targets = {}
     for i, word in enumerate(batch):
@@ -37,9 +38,6 @@ def process_batch(batch, model, mode):
     results = model.predict_words_stresses(batch, mode)
     for word, predicted_stresses in results.items():
         target_stresses = targets[word]
-        #is_ok_word = len(set(predicted_stresses).intersection(set(target_stresses))) != 0
-        #if len(target_stresses) == 0 and len(predicted_stresses) == 0:
-        #    is_ok_word = True
         is_ok_word = set(predicted_stresses) == set(target_stresses)
         wer.add(is_ok_word)
         if not is_ok_word:

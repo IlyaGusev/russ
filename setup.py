@@ -11,6 +11,13 @@ setup(
     url='https://github.com/IlyaGusev/russ',
     download_url='https://github.com/IlyaGusev/russ/archive/0.0.1.tar.gz',
     keywords=['nlp', 'russian', 'recurrent neural networks'],
+    package_data={
+        'russ': [
+            'models/ru-main/config.json',
+            'models/ru-main/vocabulary/*',
+            'models/ru-main/best.th'
+        ]
+    },
     install_requires=[
         'torch>=1.0.0',
         'allennlp>=0.8.2',
