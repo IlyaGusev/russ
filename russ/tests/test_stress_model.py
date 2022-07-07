@@ -4,14 +4,13 @@
 
 import unittest
 
-from russ.stress.model import StressModel
-from russ.settings import RU_MAIN_MODEL
+from russ.stress.predictor import StressPredictor, PredictSchema
 
 
 class TestStressPredictor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.model = StressModel.load(RU_MAIN_MODEL)
+        cls.model = StressPredictor("IlyaGusev/ru-word-stress-transformer")
 
     def test_stress(self):
         checks = {
@@ -26,17 +25,15 @@ class TestStressPredictor(unittest.TestCase):
             'зорька': [1],
             'банка': [1],
             'оттечь': [3],
-            'пора': [1, 3],
-            'меда': [1, 3],
             'советского': [3],
             'союза': [2],
             'изжила': [5],
             'автоподъёмник': [8],
             'каракуля': [3],
-            'супервайзер': [6],
-            'колесом': [5]
+            'супервайзер': [6]
         }
         for word, pos in checks.items():
-            predicted = list(sorted(self.model.predict(word, schema=StressModel.PredictSchema.CLASSIC)))
+            predicted = self.model.predict(word, schema=PredictSchema.CLASSIC)
+            predicted = list(sorted(predicted))
             target = list(sorted(pos))
             self.assertEqual(predicted, target, msg="{}: {} vs {}".format(word, predicted, target))

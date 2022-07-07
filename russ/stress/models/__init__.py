@@ -1,1 +1,0 @@
-from russ.stress.models.base import BaseModel
