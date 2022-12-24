@@ -3,3 +3,4 @@ transformers >= 4.17.0
 pygtrie >= 2.2
 pytest-cov >= 2.6.1
 codecov >= 2.0.15
+pymorphy2 >= 0.9.1

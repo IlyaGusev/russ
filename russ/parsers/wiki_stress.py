@@ -1,5 +1,6 @@
 import unicodedata
 import re
+import random
 
 
 def clean_word(word):
