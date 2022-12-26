@@ -2,6 +2,7 @@ import random
 
 import torch
 from torch.utils.data import Dataset
+from tqdm import tqdm
 
 from russ.tokenizer import CharTokenizer
 from russ.convert import convert_to_record
@@ -20,7 +21,7 @@ class StressDataset(Dataset):
         self.records = []
 
         with open(file_path) as r:
-            for line in r:
+            for line in tqdm(r):
                 if random.random() > sample_rate:
                     continue
                 record = self.convert(line)
@@ -30,11 +31,7 @@ class StressDataset(Dataset):
         record = convert_to_record(text)
         tags = record["tags"][:self.max_length - 2]
         has_primary = bool([i for i in tags if i == 1])
-        if not has_primary:
-            tags = [i if i != 2 else 1 for i in tags]
-        #else:
-        #    tags = [i if i != 2 else 0 for i in tags]
-
+        assert has_primary
         inputs = self.tokenizer(
             record["text"],
             add_special_tokens=True,

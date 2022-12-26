@@ -67,7 +67,7 @@ class CharTokenizer(PreTrainedTokenizer):
         return self.vocab
 
     def _convert_token_to_id(self, token):
-        return self.vocab.get(token)
+        return self.vocab.get(token, self.vocab[self.unk_token])
 
     def _convert_id_to_token(self, index):
         return self.ids_to_tokens[index]

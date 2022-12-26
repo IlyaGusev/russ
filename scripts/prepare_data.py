@@ -138,7 +138,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--wiktionary-dump-path", default=None)
     parser.add_argument("--inflected-dict-path", default=None)
-    parser.add_argument("--inflected-sample-rate", default=0.3)
+    parser.add_argument("--inflected-sample-rate", default=0.3, type=float)
     parser.add_argument("--custom-dict-path", default=None)
     parser.add_argument("--all-path", required=True)
     parser.add_argument("--train-path", required=True)

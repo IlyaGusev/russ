@@ -37,6 +37,7 @@ def predict_batch(texts, tokenizer, model, max_length):
         if 1 not in predicted_labels:
             primary_stress_index = scores[:, 0].argmin()
             predicted_labels[primary_stress_index] = 1
+        batch_predicted_labels.append(predicted_labels)
     return batch_predicted_labels
 
 
@@ -47,13 +48,12 @@ def evaluate(input_path, model_path, batch_size):
     records = []
     with open(input_path) as r:
         for i, line in tqdm(enumerate(r)):
-            if i == 10000:
-                break
             record = convert_to_record(line)
             records.append(record)
 
     correct_cnt, all_cnt = 0, 0
-    for batch in gen_batch(records, batch_size):
+    for batch in tqdm(gen_batch(records, batch_size)):
+        batch = [r for r in batch if r["text"]]
         batch_texts = [r["text"] for r in batch]
         batch_labels = [r["tags"] for r in batch]
         batch_predicted_labels = predict_batch(batch_texts, tokenizer, model, max_length=40)
@@ -61,10 +61,6 @@ def evaluate(input_path, model_path, batch_size):
             is_correct = int(pred_labels == true_labels)
             correct_cnt += int(is_correct)
             all_cnt += 1
-            if not is_correct:
-                print(text)
-                print(true_labels)
-                print(pred_labels)
     print(correct_cnt, all_cnt, 100.0 * correct_cnt / all_cnt)
 
 
