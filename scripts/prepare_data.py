@@ -7,8 +7,8 @@ from collections import defaultdict
 from pymorphy2 import MorphAnalyzer
 
 from russ.parsers.inflected_stress import parse as parse_inflected_stress
-from russ.parsers.inflected_stress import parse_lexemes
 from russ.parsers.wiki_stress import parse as parse_wiki_stress
+from russ.parsers.espeak_stress import parse as parse_espeak_stress
 from russ.syllables import VOWELS, get_syllables
 from russ.convert import convert_to_record
 
@@ -71,6 +71,7 @@ def prepare(
     wiktionary_dump_path: str,
     inflected_dict_path: str,
     custom_dict_path: str,
+    espeak_dict_path: str,
     inflected_sample_rate: float,
     all_path: str,
     train_path: str,
@@ -86,6 +87,9 @@ def prepare(
     random.seed(seed)
 
     words = set()
+    if espeak_dict_path:
+        for word in tqdm(parse_espeak_stress(espeak_dict_path), desc="Espeak"):
+            words.add(word.strip())
     if inflected_dict_path:
         for word in tqdm(parse_inflected_stress(inflected_dict_path), desc="Inflected"):
             if random.random() < inflected_sample_rate:
@@ -137,16 +141,17 @@ def prepare(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--wiktionary-dump-path", default=None)
+    parser.add_argument("--espeak-dict-path", default=None)
     parser.add_argument("--inflected-dict-path", default=None)
     parser.add_argument("--inflected-sample-rate", default=0.3, type=float)
     parser.add_argument("--custom-dict-path", default=None)
-    parser.add_argument("--all-path", required=True)
-    parser.add_argument("--train-path", required=True)
-    parser.add_argument("--test-path", required=True)
-    parser.add_argument("--val-path", required=True)
+    parser.add_argument("--all-path", default="data/all.txt")
+    parser.add_argument("--train-path", default="data/train.txt")
+    parser.add_argument("--test-path", default="data/test.txt")
+    parser.add_argument("--val-path", default="data/val.txt")
     parser.add_argument("--val-part", type=float, default=0.05)
     parser.add_argument("--test-part", type=float, default=0.05)
-    parser.add_argument("--split-mode", type=str, choices=("lexemes", "sort", "shuffle"), default="lexemes")
+    parser.add_argument("--split-mode", choices=("lexemes", "sort", "shuffle"), default="lexemes")
     parser.add_argument("--lower", action="store_true")
     parser.add_argument("--seed", type=int, default=1337)
     args = parser.parse_args()

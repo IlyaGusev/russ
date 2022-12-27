@@ -10,7 +10,7 @@ from russ.stress.predictor import StressPredictor, PredictSchema
 class TestStressPredictor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.model = StressPredictor("IlyaGusev/ru-word-stress-transformer")
+        cls.model = StressPredictor("models/v5")
 
     def test_stress(self):
         checks = {
@@ -30,7 +30,8 @@ class TestStressPredictor(unittest.TestCase):
             'изжила': [5],
             'автоподъёмник': [8],
             'каракуля': [3],
-            'супервайзер': [6]
+            'супервайзер': [6],
+            'колесом': [5]
         }
         for word, pos in checks.items():
             predicted = self.model.predict(word, schema=PredictSchema.CLASSIC)

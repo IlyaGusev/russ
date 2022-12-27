@@ -2,9 +2,11 @@ import unicodedata
 import re
 import random
 
+from russ.convert import PRIMARY_STRESS_CHAR, SECONDARY_STRESS_CHAR
+
 
 def clean_word(word):
-    word = word.strip().replace(chr(769), chr(39)).replace(chr(768), chr(96))
+    word = word.strip().replace(chr(769), PRIMARY_STRESS_CHAR).replace(chr(768), SECONDARY_STRESS_CHAR)
     matches = re.findall(r'\(\w+\)', word)
     if len(matches) == 1:
         yield word.replace(matches[0], "")
@@ -31,7 +33,7 @@ def parse(dump_path, phrases_mode=False):
 
                 has_good_only = True
                 for ch in word:
-                    if not ('а' <= ch <= 'я' or 'А' <= ch <= 'Я' or ord(ch) == 769 or ord(ch) == 768 or ch in "()~-ёЁ "):
+                    if not ('а' <= ch <= 'я' or 'А' <= ch <= 'Я' or ord(ch) == 769 or ord(ch) == 768 or ch in "()~-ёЁ'` "):
                         has_good_only = False
                 if not has_good_only:
                     continue

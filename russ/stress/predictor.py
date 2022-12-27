@@ -7,7 +7,7 @@ from torch import Tensor
 
 from russ.syllables import get_first_vowel_position, get_syllables
 from russ.stress.dict import StressDict, Stress
-from russ.stress.model import StressTransformerModel, PredictSchema
+from russ.stress.model import StressModel, PredictSchema
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class StressPredictor:
     ):
         super().__init__()
 
-        self.model = StressTransformerModel(model_name)
+        self.model = StressModel(model_name)
         self.stress_dict = StressDict()
         if stress_dict_path:
             self.stress_dict.load(stress_dict_path)
@@ -38,11 +38,11 @@ class StressPredictor:
                 dict_record = self.stress_dict.get(word, Stress.Type.PRIMARY)
                 stresses[word] = dict_record
 
-        batch = [word for word in words if word not in stresses]
-        if not batch:
+        unk_words = [word for word in words if word not in stresses]
+        if not unk_words:
             return stresses
-        results = self.model.predict_batch(batch, schema)
-        stresses = {word: word_stresses for word, word_stresses in zip(batch, results)}
+        results = self.model.predict(unk_words, schema)
+        stresses = {word: word_stresses for word, word_stresses in zip(unk_words, results)}
         return stresses
 
     def predict(self, word: str, schema: PredictSchema = PredictSchema.CONSTRAINED):

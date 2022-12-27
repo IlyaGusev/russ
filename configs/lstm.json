@@ -1,0 +1,15 @@
+{
+    "model": {
+        "model_type": "lstm",
+        "hidden_size": 256,
+        "num_hidden_layers": 2
+    },
+    "batch_size": 1024,
+    "gradient_accumulation_steps": 1,
+    "logging_steps": 64,
+    "eval_steps": 256,
+    "save_steps": 256,
+    "warmup_steps": 128,
+    "num_train_epochs": 25,
+    "learning_rate": 0.0005
+}

@@ -3,7 +3,7 @@ from typing import Optional, Tuple, List
 from collections import OrderedDict
 
 from torch.utils.data import Dataset
-from transformers import PreTrainedTokenizer
+from transformers import PreTrainedTokenizer, AutoTokenizer
 
 
 def load_vocab(vocab_file):
@@ -26,6 +26,7 @@ class CharTokenizer(PreTrainedTokenizer):
         unk_token="[UNK]",
         bos_token="[BOS]",
         eos_token="[EOS]",
+        do_lower_case=False,
         *args,
         **kwargs
     ):
@@ -34,8 +35,10 @@ class CharTokenizer(PreTrainedTokenizer):
             unk_token=unk_token,
             bos_token=bos_token,
             eos_token=eos_token,
+            do_lower_case=do_lower_case,
             **kwargs
         )
+        self.do_lower_case = do_lower_case
 
         if not vocab_file or not os.path.isfile(vocab_file):
             self.vocab = OrderedDict()
@@ -49,6 +52,8 @@ class CharTokenizer(PreTrainedTokenizer):
         with open(file_path) as r:
             for line in r:
                 word = line.strip()
+                if self.do_lower_case:
+                    word = word.lower()
                 vocab |= set(word)
         vocab = list(vocab)
         vocab.sort()
@@ -67,12 +72,16 @@ class CharTokenizer(PreTrainedTokenizer):
         return self.vocab
 
     def _convert_token_to_id(self, token):
+        if self.do_lower_case:
+            token = token.lower()
         return self.vocab.get(token, self.vocab[self.unk_token])
 
     def _convert_id_to_token(self, index):
         return self.ids_to_tokens[index]
 
     def _tokenize(self, text):
+        if self.do_lower_case:
+            text = text.lower()
         return list(text)
 
     def convert_tokens_to_string(self, tokens):
@@ -119,3 +128,5 @@ class CharTokenizer(PreTrainedTokenizer):
                 writer.write(token + "\n")
                 index += 1
         return (vocab_file,)
+
+AutoTokenizer.register("char_tokenizer", CharTokenizer)
