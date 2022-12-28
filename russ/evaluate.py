@@ -20,6 +20,7 @@ def evaluate(input_path, model_path, batch_size):
     texts = [r["text"] for r in records]
     labels = [r["tags"] for r in records]
     predictions = model.predict(texts, batch_size=batch_size)
+    assert len(predictions) == len(labels) == len(texts), f"{len(predictions)} vs {len(labels)}"
     for text, true_labels, pred_stresses in zip(texts, labels, predictions):
         for index in pred_stresses:
             assert index < len(true_labels), f"{true_labels}, {pred_stresses}, {text}"

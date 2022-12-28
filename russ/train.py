@@ -17,7 +17,7 @@ def train(
 ):
     with open(config_path) as r:
         config = json.load(r)
-    tokenizer = CharTokenizer()
+    tokenizer = CharTokenizer(do_lower_case=config["do_lower_case"])
     tokenizer.train(train_path)
 
     max_length = 40

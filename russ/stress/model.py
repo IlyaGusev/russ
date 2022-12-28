@@ -23,21 +23,15 @@ class PredictSchema(Enum):
 
 
 class StressModel:
-    def __init__(self, model_name, lower: bool = False, max_length: int = 40):
+    def __init__(self, model_name, max_length: int = 40):
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name,
             trust_remote_code=True
         )
         self.model = AutoModelForTokenClassification.from_pretrained(model_name)
-        self.lower = lower
         self.max_length = max_length
 
-    def preprocess_text(self, text):
-        text = text[:self.max_length-2]
-        return text
-
     def predict_batch(self, texts, schema: PredictSchema):
-        texts = [self.preprocess_text(text) for text in texts]
         inputs = self.tokenizer(
             texts,
             max_length=self.max_length,
@@ -57,7 +51,8 @@ class StressModel:
             stresses = []
             if schema == PredictSchema.CLASSIC:
                 classes = scores.argmax(dim=1).tolist()
-                assert len(classes) == len(text), f"{classes}, {text}"
+                assert len(classes) == len(text[:self.max_length - 1]), \
+                    f"{text}, {len(classes)}, {len(text)}"
                 stresses = [i for i, stress_type in enumerate(classes) if stress_type == 1]
 
             elif schema == PredictSchema.CONSTRAINED:

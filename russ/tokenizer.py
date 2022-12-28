@@ -22,10 +22,10 @@ class CharTokenizer(PreTrainedTokenizer):
     def __init__(
         self,
         vocab_file=None,
-        pad_token="[PAD]",
-        unk_token="[UNK]",
-        bos_token="[BOS]",
-        eos_token="[EOS]",
+        pad_token="[pad]",
+        unk_token="[unk]",
+        bos_token="[bos]",
+        eos_token="[eos]",
         do_lower_case=False,
         *args,
         **kwargs
