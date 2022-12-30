@@ -6,7 +6,11 @@ PRIMARY_STRESS_CHAR = "'"
 SECONDARY_STRESS_CHAR = "`"
 
 
-def convert_to_record(text: str) -> Dict:
+def convert_to_record(
+    text: str,
+    skip_secondary: bool = False,
+    convert_secondary: bool = False
+) -> Dict:
     vowels = set(VOWELS)
     text = text.strip()
     text = text.replace("ё" + PRIMARY_STRESS_CHAR, "ё")
@@ -23,6 +27,10 @@ def convert_to_record(text: str) -> Dict:
             schema.append(0)
             clean_word += ch
     assert len(schema) == len(clean_word)
+    if skip_secondary:
+        schema = [(0 if s == 2 else s) for s in schema]
+    if convert_secondary:
+        schema = [(1 if s == 2 else s) for s in schema]
     return {
         "tokens": list(clean_word),
         "text": clean_word,

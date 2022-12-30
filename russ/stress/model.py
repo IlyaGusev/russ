@@ -23,12 +23,12 @@ class PredictSchema(Enum):
 
 
 class StressModel:
-    def __init__(self, model_name, max_length: int = 40):
+    def __init__(self, model_name, max_length: int = 40, device: str = "cpu"):
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name,
             trust_remote_code=True
         )
-        self.model = AutoModelForTokenClassification.from_pretrained(model_name)
+        self.model = AutoModelForTokenClassification.from_pretrained(model_name).to(device)
         self.max_length = max_length
 
     def predict_batch(self, texts, schema: PredictSchema):
@@ -40,6 +40,7 @@ class StressModel:
             truncation=True,
             return_tensors="pt"
         )
+        inputs = {key: value.to(self.model.device) for key, value in inputs.items()}
         outputs = self.model(**inputs)
         logits = outputs["logits"]
         batch_scores = torch.nn.functional.softmax(logits, dim=2)

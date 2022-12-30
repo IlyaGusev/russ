@@ -10,7 +10,7 @@ from russ.stress.predictor import StressPredictor, PredictSchema
 class TestStressPredictor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.model = StressPredictor("models/v5")
+        cls.model = StressPredictor("IlyaGusev/ru-word-stress-transformer")
 
     def test_stress(self):
         checks = {

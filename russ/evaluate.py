@@ -1,4 +1,5 @@
 import argparse
+import time
 
 import torch
 from transformers import AutoModelForTokenClassification, pipeline
@@ -8,8 +9,6 @@ from russ.convert import convert_to_record
 
 
 def evaluate(input_path, model_path, batch_size):
-    model = StressModel(model_path)
-
     records = []
     with open(input_path) as r:
         for i, line in enumerate(r):
@@ -19,8 +18,21 @@ def evaluate(input_path, model_path, batch_size):
     correct_cnt, all_cnt = 0, 0
     texts = [r["text"] for r in records]
     labels = [r["tags"] for r in records]
+
+    model = StressModel(model_path)
+    start_time = time.perf_counter_ns()
     predictions = model.predict(texts, batch_size=batch_size)
     assert len(predictions) == len(labels) == len(texts), f"{len(predictions)} vs {len(labels)}"
+    end_time = time.perf_counter_ns()
+    print("CPU time, micros, per sample:", (end_time - start_time) // 1000 // len(predictions))
+
+    model = StressModel(model_path, device="cuda")
+    start_time = time.perf_counter_ns()
+    predictions = model.predict(texts, batch_size=batch_size)
+    assert len(predictions) == len(labels) == len(texts), f"{len(predictions)} vs {len(labels)}"
+    end_time = time.perf_counter_ns()
+    print("GPU time, micros, per sample:", (end_time - start_time) // 1000 // len(predictions))
+
     for text, true_labels, pred_stresses in zip(texts, labels, predictions):
         for index in pred_stresses:
             assert index < len(true_labels), f"{true_labels}, {pred_stresses}, {text}"
