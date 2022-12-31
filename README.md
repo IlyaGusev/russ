@@ -14,7 +14,6 @@ or
 ```
 git clone https://github.com/IlyaGusev/russ
 cd russ
-git lfs pull
 pip install -r requirements.txt
 python setup.py
 ```
