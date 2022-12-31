@@ -14,7 +14,6 @@ or
 ```
 git clone https://github.com/IlyaGusev/russ
 cd russ
-git lfs pull
 pip install -r requirements.txt
 python setup.py
 ```
@@ -52,9 +51,10 @@ Preparing data for training
 | --inflected-dict-path  | None    | path to downloaded file with lexemes                                                |
 | --inflected-sample-rate | 0.3    | part of inflected dict to use                                                       |
 | --split-mode           | lexemes | how to split into train, val and test files: "sort", "lexemes" or "shuffle"         |
-| --train-path           |         | path to output train file                                                           |
-| --val-path             |         | path to output validation file                                                      |
-| --test-path            |         | path to output test file                                                            |
+| --all-path           | data/all.txt        | path to output train file                                                           |
+| --train-path           | data/train.txt | path to output train file                                                           |
+| --val-path             | data/val.txt | path to output validation file                                                      |
+| --test-path            | data/test.txt | path to output test file                                                            |
 | --val-part             | 0.05    | part of validation file                                                             |
 | --test-part            | 0.05    | part of test file                                                                   |
-| --lower                | Fasle   | lowercase all words. Order: lower -> sort -> shuffle                                |
+| --lower                | Fasle   | lowercase all words                               |
