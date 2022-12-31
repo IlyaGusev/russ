@@ -1,6 +1,6 @@
 # Python library for word stress detection #
 
-[![Build Status](https://travis-ci.org/IlyaGusev/russ.svg?branch=master)](https://travis-ci.org/IlyaGusev/russ)
+[![Tests Status](https://github.com/IlyaGusev/russ/actions/workflows/python-package.yml/badge.svg)](https://github.com/IlyaGusev/russ/actions/workflows/python-package.yml)
 [![Code Climate](https://codeclimate.com/github/IlyaGusev/russ/badges/gpa.svg)](https://codeclimate.com/github/IlyaGusev/russ)
 [![codecov](https://codecov.io/gh/IlyaGusev/russ/branch/master/graph/badge.svg)](https://codecov.io/gh/IlyaGusev/russ)
 
@@ -42,21 +42,7 @@ Script for downloading datasets:
 
 #### scripts/prepare_data.py
 
-Script preparing data for training
-    parser.add_argument("--wiktionary-dump-path", default=None)
-    parser.add_argument("--espeak-dict-path", default=None)
-    parser.add_argument("--inflected-dict-path", default=None)
-    parser.add_argument("--inflected-sample-rate", default=0.3, type=float)
-    parser.add_argument("--custom-dict-path", default=None)
-    parser.add_argument("--all-path", default="data/all.txt")
-    parser.add_argument("--train-path", default="data/train.txt")
-    parser.add_argument("--test-path", default="data/test.txt")
-    parser.add_argument("--val-path", default="data/val.txt")
-    parser.add_argument("--val-part", type=float, default=0.05)
-    parser.add_argument("--test-part", type=float, default=0.05)
-    parser.add_argument("--split-mode", choices=("lexemes", "sort", "shuffle"), default="lexemes")
-    parser.add_argument("--lower", action="store_true")
-    parser.add_argument("--seed", type=int, default=1337)
+Preparing data for training
 
 | Argument               | Default | Description                                                                         |
 |:-----------------------|:--------|:------------------------------------------------------------------------------------|
