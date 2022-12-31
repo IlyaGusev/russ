@@ -57,4 +57,4 @@ Preparing data for training
 | --test-path            | data/test.txt | path to output test file                                                            |
 | --val-part             | 0.05    | part of validation file                                                             |
 | --test-part            | 0.05    | part of test file                                                                   |
-| --lower                | Fasle   | lowercase all words. Order: lower -> sort -> shuffle                                |
+| --lower                | Fasle   | lowercase all words                               |
