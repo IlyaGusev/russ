@@ -3,6 +3,7 @@ from typing import List
 VOWELS = "aeiouAEIOUаоэиуыеёюяАОЭИУЫЕЁЮЯ"
 CLOSED_SYLLABLE_CHARS = "рлймнРЛЙМН"
 
+
 def get_first_vowel_position(string):
     for i, ch in enumerate(string):
         if ch in VOWELS:
@@ -26,7 +27,7 @@ class Syllable(Annotation):
     Разметка слога. Включает в себя аннотацию и номер слога, а также ударение.
     Если ударение падает не на этот слог, -1.
     """
-    def __init__(self, begin: int, end: int, number: int, text: str, stress: int=-1) -> None:
+    def __init__(self, begin: int, end: int, number: int, text: str, stress: int = -1) -> None:
         super(Syllable, self).__init__(begin, end, text)
         self.number = number
         self.stress = stress

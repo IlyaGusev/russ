@@ -12,4 +12,6 @@ def parse(dict_file):
 def parse_lexemes(dict_file):
     with open(dict_file, 'r', encoding='utf-8') as r:
         for line in r:
-            yield [unicodedata.normalize('NFKC', word.strip()) for word in line.split("#")[1].split(",")]
+            yield [
+                unicodedata.normalize('NFKC', word.strip()) for word in line.split("#")[1].split(",")
+            ]

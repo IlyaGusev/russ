@@ -61,6 +61,7 @@ def main(
             })
     write_jsonl(records, output_file)
 
+
 input_file = sys.argv[1]
 output_file = sys.argv[2]
 main(input_file, output_file)

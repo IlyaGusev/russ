@@ -72,4 +72,3 @@ class StressModel:
             batch_predicted_stresses = self.predict_batch(batch_texts, schema)
             predicted_stresses.extend(batch_predicted_stresses)
         return predicted_stresses
-

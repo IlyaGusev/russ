@@ -116,10 +116,10 @@ class CharTokenizer(PreTrainedTokenizer):
         filename_prefix: Optional[str] = None
     ) -> Tuple[str]:
         assert os.path.isdir(save_directory)
+        prefix = (filename_prefix + "-" if filename_prefix else "")
         vocab_file = os.path.join(
             save_directory,
-            (filename_prefix + "-" if filename_prefix else "") +
-            self.vocab_files_names["vocab_file"]
+            prefix + self.vocab_files_names["vocab_file"]
         )
         index = 0
         with open(vocab_file, "w", encoding="utf-8") as writer:
@@ -128,5 +128,6 @@ class CharTokenizer(PreTrainedTokenizer):
                 writer.write(token + "\n")
                 index += 1
         return (vocab_file,)
+
 
 AutoTokenizer.register("char_tokenizer", CharTokenizer)

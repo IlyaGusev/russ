@@ -33,7 +33,7 @@ def parse(dump_path, phrases_mode=False):
 
                 has_good_only = True
                 for ch in word:
-                    if not ('а' <= ch <= 'я' or 'А' <= ch <= 'Я' or ord(ch) == 769 or ord(ch) == 768 or ch in "()~-ёЁ'` "):
+                    if not ('а' <= ch <= 'я' or 'А' <= ch <= 'Я' or ord(ch) in (769, 768) or ch in "()~-ёЁ'` "):
                         has_good_only = False
                 if not has_good_only:
                     continue

@@ -4,13 +4,14 @@ import pickle
 
 import pygtrie
 
+
 class Stress:
     class Type(Enum):
         ANY = -1
         PRIMARY = 0
         SECONDARY = 1
 
-    def __init__(self, position: int, stress_type: Type=Type.PRIMARY) -> None:
+    def __init__(self, position: int, stress_type: Type = Type.PRIMARY) -> None:
         self.position = position
         self.type = stress_type
 
@@ -39,7 +40,7 @@ class StressDict:
         with open(dump_filename, "rb") as f:
             self.data = pickle.load(f)
 
-    def get(self, word: str, stress_type: Stress.Type=Stress.Type.ANY) -> List[int]:
+    def get(self, word: str, stress_type: Stress.Type = Stress.Type.ANY) -> List[int]:
         if word in self.data:
             if stress_type == Stress.Type.ANY:
                 return [stress.position for stress in self.data[word]]

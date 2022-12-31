@@ -3,9 +3,9 @@ import copy
 import torch
 from torch.nn.functional import pad
 from torch.nn import CrossEntropyLoss, Embedding, Dropout, LSTM, Linear
-from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from transformers import PretrainedConfig, PreTrainedModel
 from transformers import AutoConfig, AutoModel, AutoModelForTokenClassification
+
 
 class LstmModelConfig(PretrainedConfig):
     model_type = "lstm"
@@ -64,11 +64,9 @@ class LstmModelForTokenClassification(PreTrainedModel):
         token_type_ids=None,
         labels=None
     ):
-        #padded_input_ids = pack_padded_sequence(input_ids, attention_mask.sum(dim=-1), batch_first=True)
         projections = self.embeddings_layer.forward(input_ids)
         projections = projections.reshape(projections.size(0), projections.size(1), -1)
-        output, _= self.lstm_layer(projections)
-        #output, input_sizes = pad_packed_sequence(output, batch_first=True)
+        output, _ = self.lstm_layer(projections)
         output = self.dropout(output)
         output = self.out_layer.forward(output)
         result = {"logits": output}

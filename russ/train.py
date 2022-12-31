@@ -1,6 +1,7 @@
 import argparse
 import json
-from transformers import BertConfig, AutoModelForTokenClassification, TrainingArguments, Trainer, DebertaV2Config, AutoConfig
+from transformers import BertConfig, AutoModelForTokenClassification
+from transformers import TrainingArguments, Trainer, DebertaV2Config, AutoConfig
 
 from russ.lstm import LstmModelConfig, LstmModelForTokenClassification
 from russ.tokenizer import CharTokenizer
