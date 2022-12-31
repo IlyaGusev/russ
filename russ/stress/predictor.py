@@ -51,7 +51,7 @@ class StressPredictor:
         return [stresses[word] for word in words]
 
     def predict(self, word: str, schema: PredictSchema = PredictSchema.CONSTRAINED):
-        return self.predict_words([word], schema)[word]
+        return self.predict_words([word], schema)[0]
 
     def __str__(self):
         s = str(self.model) + "\n"
