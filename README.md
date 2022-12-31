@@ -20,6 +20,8 @@ python setup.py
 
 ### Usage
 
+Colab: [link](https://colab.research.google.com/drive/1rv_NkyI7-EY45XZb0Bax2xR2Ms71C1lc)
+
 ```
 from russ.stress.predictor import StressPredictor
 
