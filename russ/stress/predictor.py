@@ -30,7 +30,7 @@ class StressPredictor:
         words: List[str],
         schema: PredictSchema = PredictSchema.CONSTRAINED,
         batch_size: int = 2048
-    ):
+    ) -> List[List[int]]:
         stresses = {}
         for word in words:
             syllables = get_syllables(word)
@@ -45,7 +45,7 @@ class StressPredictor:
 
         unk_words = [word for word in words if word not in stresses]
         if not unk_words:
-            return stresses
+            return [stresses[word] for word in words]
         results = self.model.predict(unk_words, schema, batch_size=batch_size)
         stresses = {word: word_stresses for word, word_stresses in zip(unk_words, results)}
         return [stresses[word] for word in words]
