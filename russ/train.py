@@ -17,23 +17,31 @@ def train(
 ):
     with open(config_path) as r:
         config = json.load(r)
+
     tokenizer = CharTokenizer(do_lower_case=config["do_lower_case"])
     tokenizer.train(train_path)
 
     max_length = 40
-    train_dataset = StressDataset(train_path, tokenizer, sample_rate=sample_rate, max_length=max_length)
-    val_dataset = StressDataset(val_path, tokenizer, sample_rate=sample_rate, max_length=max_length)
+    dataset_params = {
+        "tokenizer": tokenizer,
+        "sample_rate": sample_rate,
+        "max_length": max_length,
+        "skip_secondary": config.pop("skip_secondary", False),
+        "convert_secondary": config.pop("convert_secondary", False)
+    }
+    train_dataset = StressDataset(train_path, **dataset_params)
+    val_dataset = StressDataset(val_path, **dataset_params)
 
     for item in train_dataset:
         print(item)
         print(tokenizer.decode(item["input_ids"], skip_special_tokens=True))
         break
 
-    id2label = {
+    id2label = config.pop("id2label", {
         0: "NO",
         1: "PRIMARY",
         2: "SECONDARY"
-    }
+    })
     model_params = config["model"]
     model_type = model_params.pop("model_type")
     configuration = AutoConfig.for_model(
@@ -46,29 +54,6 @@ def train(
         label2id={label: i for i, label in id2label.items()},
         pad_token_id=tokenizer.pad_token_id
     )
-    #configuration = DebertaV2Config(
-    #    vocab_size=tokenizer.vocab_size,
-    #    hidden_size=256,
-    #    num_hidden_layers=4,
-    #    num_attention_heads=8,
-    #    max_position_embeddings=max_length + 2,
-    #    intermediate_size=1024,
-    #    max_length=max_length,
-    #    num_labels=len(id2label),
-    #    id2label=id2label,
-    #    label2id={label: i for i, label in id2label.items()},
-    #    pad_token_id=tokenizer.pad_token_id
-    #)
-    #configuration = LstmModelConfig(
-    #    vocab_size=tokenizer.vocab_size,
-    #    hidden_size=256,
-    #    num_hidden_layers=2,
-    #    max_length=max_length,
-    #    num_labels=len(id2label),
-    #    id2label=id2label,
-    #    label2id={label: i for i, label in id2label.items()},
-    #    pad_token_id=tokenizer.pad_token_id
-    #)
     model = AutoModelForTokenClassification.from_config(configuration)
     print(model)
     params_num = sum(p.numel() for p in model.parameters())
