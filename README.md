@@ -22,9 +22,9 @@ python setup.py
 ### Usage
 
 ```
-from russ.stress.model import StressModel
+from russ.stress.predictor import StressPredictor
 
-model = StressModel.load()
+model = StressPredictor()
 model.predict("корова")
 
 >>> [3]
@@ -35,53 +35,40 @@ model.predict("корова")
 #### download.sh
 
 Script for downloading datasets:
-ru_custom.txt: 885 words
-zaliznyak.txt: 86839 lexemes
-ruwiktionary-20190501-pages-articles.xml: articles from ruwiktionary
+* ru_custom.txt: 885 words
+* zaliznyak.txt: 86839 lexemes
+* espeak.txt: 804909 words
+* ruwiktionary-20221201-pages-articles.xml: articles from ruwiktionary, update to a new dump
 
-#### prepare_data.py
+#### scripts/prepare_data.py
 
 Script preparing data for training
+    parser.add_argument("--wiktionary-dump-path", default=None)
+    parser.add_argument("--espeak-dict-path", default=None)
+    parser.add_argument("--inflected-dict-path", default=None)
+    parser.add_argument("--inflected-sample-rate", default=0.3, type=float)
+    parser.add_argument("--custom-dict-path", default=None)
+    parser.add_argument("--all-path", default="data/all.txt")
+    parser.add_argument("--train-path", default="data/train.txt")
+    parser.add_argument("--test-path", default="data/test.txt")
+    parser.add_argument("--val-path", default="data/val.txt")
+    parser.add_argument("--val-part", type=float, default=0.05)
+    parser.add_argument("--test-part", type=float, default=0.05)
+    parser.add_argument("--split-mode", choices=("lexemes", "sort", "shuffle"), default="lexemes")
+    parser.add_argument("--lower", action="store_true")
+    parser.add_argument("--seed", type=int, default=1337)
 
 | Argument               | Default | Description                                                                         |
 |:-----------------------|:--------|:------------------------------------------------------------------------------------|
 | --wiktionary-dump-path | None    | path to downloaded wiktionary dump                                                  |
+| --espeak-dump-path     | None    | path to espeak dump                                                                 |
 | --custom-dict-path     | None    | path to file with custom words                                                      |
 | --inflected-dict-path  | None    | path to downloaded file with lexemes                                                |
-| --split-lexemes        | False   | use only file with lexemes and leave different lexemes in train, val and test files |
+| --inflected-sample-rate | 0.3    | part of inflected dict to use                                                       |
+| --split-mode           | lexemes | how to split into train, val and test files: "sort", "lexemes" or "shuffle"         |
 | --train-path           |         | path to output train file                                                           |
 | --val-path             |         | path to output validation file                                                      |
 | --test-path            |         | path to output test file                                                            |
 | --val-part             | 0.05    | part of validation file                                                             |
 | --test-part            | 0.05    | part of test file                                                                   |
 | --lower                | Fasle   | lowercase all words. Order: lower -> sort -> shuffle                                |
-| --sort                 | False   | sort all words or lexemes                                                           |
-| --shuffle              | False   | shuffle all words or lexemes                                                        |
-
-
-#### train.py
-
-Script for model training. Model directory should exist as well as config file and vocabulary directory.
-
-| Argument          | Default | Description                          |
-|:------------------|:--------|:-------------------------------------|
-| --train-path      |         | path to train dataset                |
-| --model-path      |         | path to directory with model's files |
-| --val-path        | None    | path to val dataset                  |
-| --seed            | 1048596 | random seed                          |
-| --vocabulary-path | None    | custom path to vocabulary            |
-| --config-path     | None    | custom path to config                |
-
-#### evaluate.py
-
-Script for model evaluation.
-
-| Argument             | Default | Description                                               |
-|:---------------------|:--------|:----------------------------------------------------------|
-| --test-path          |         | path to test dataset                                      |
-| --model-path         |         | path to directory with model's files                      |
-| --metric             | wer     | what metric to evaluate, choices=("wer", "wer-constr")    |
-| --max-count          | None    | how many test examples to consider                        |
-| --report-every       | None    | print metrics every N'th step                             |
-| --batch-size         | 32      | size of a batch with test examples to run simultaneously  |
-| --errors-file-path   | None    | path to log file with all errors                          |

@@ -15,17 +15,22 @@ logger = logging.getLogger(__name__)
 class StressPredictor:
     def __init__(
         self,
-        model_name: str,
+        model_name: str = "IlyaGusev/ru-word-stress-transformer",
+        device: str = "cpu",
         stress_dict_path: str = None
     ):
-        super().__init__()
-
-        self.model = StressModel(model_name)
-        self.stress_dict = StressDict()
+        self.model = StressModel(model_name, device=device)
+        self.stress_dict = None
         if stress_dict_path:
+            self.stress_dict = StressDict()
             self.stress_dict.load(stress_dict_path)
 
-    def predict_words_stresses(self, words: List[str], schema: PredictSchema = PredictSchema.CONSTRAINED):
+    def predict_words(
+        self,
+        words: List[str],
+        schema: PredictSchema = PredictSchema.CONSTRAINED,
+        batch_size: int = 2048
+    ):
         stresses = {}
         for word in words:
             syllables = get_syllables(word)
@@ -34,19 +39,19 @@ class StressPredictor:
                 stresses[word] = [] if first_vowel_pos == -1 else [first_vowel_pos]
                 continue
 
-            if len(self.stress_dict) != 0:
+            if self.stress_dict is not None:
                 dict_record = self.stress_dict.get(word, Stress.Type.PRIMARY)
                 stresses[word] = dict_record
 
         unk_words = [word for word in words if word not in stresses]
         if not unk_words:
             return stresses
-        results = self.model.predict(unk_words, schema)
+        results = self.model.predict(unk_words, schema, batch_size=batch_size)
         stresses = {word: word_stresses for word, word_stresses in zip(unk_words, results)}
-        return stresses
+        return [stresses[word] for word in words]
 
     def predict(self, word: str, schema: PredictSchema = PredictSchema.CONSTRAINED):
-        return self.predict_words_stresses([word], schema)[word]
+        return self.predict_words([word], schema)[word]
 
     def __str__(self):
         s = str(self.model) + "\n"
