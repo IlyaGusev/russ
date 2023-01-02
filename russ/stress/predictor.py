@@ -16,10 +16,11 @@ class StressPredictor:
     def __init__(
         self,
         model_name: str = "IlyaGusev/ru-word-stress-transformer",
+        revision: str = "b44e211",
         device: str = "cpu",
         stress_dict_path: str = None
     ):
-        self.model = StressModel(model_name, device=device)
+        self.model = StressModel(model_name, device=device, revision=revision)
         self.stress_dict = None
         if stress_dict_path:
             self.stress_dict = StressDict()

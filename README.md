@@ -31,6 +31,15 @@ model.predict("корова")
 >>> [3]
 ```
 
+### Dataset
+* Train/val/test split: [link](https://www.dropbox.com/s/0c4xesynenj1xyx/russ_dataset.tar.gz)
+
+### Metrics
+* CPU, AMD EPYC 7282, batch size = 2048: 1495 μs for 1 word
+* GPU, 1x RTX 3090, batch size = 2048: 173 μs for 1 word
+* Test accuracy: 89.73%
+* All accuracy: 97.95%
+
 ### Commands
 
 #### download.sh

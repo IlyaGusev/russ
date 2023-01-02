@@ -23,9 +23,16 @@ class PredictSchema(Enum):
 
 
 class StressModel:
-    def __init__(self, model_name, max_length: int = 40, device: str = "cpu"):
+    def __init__(
+        self,
+        model_name,
+        revision: str = None,
+        max_length: int = 40,
+        device: str = "cpu"
+    ):
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name,
+            revision=revision,
             trust_remote_code=True
         )
         self.model = AutoModelForTokenClassification.from_pretrained(model_name).to(device)
