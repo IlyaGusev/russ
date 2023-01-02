@@ -1,7 +1,7 @@
 # Python library for word stress detection #
 
 [![Tests Status](https://github.com/IlyaGusev/russ/actions/workflows/python-package.yml/badge.svg)](https://github.com/IlyaGusev/russ/actions/workflows/python-package.yml)
-[![Code Climate](https://codeclimate.com/github/IlyaGusev/russ/badges/gpa.svg)](https://codeclimate.com/github/IlyaGusev/russ)
+[![PyPI Version](https://img.shields.io/pypi/v/russ.svg)](https://pypi.python.org/pypi/russ)
 [![codecov](https://codecov.io/gh/IlyaGusev/russ/branch/master/graph/badge.svg)](https://codecov.io/gh/IlyaGusev/russ)
 
 ### Install
