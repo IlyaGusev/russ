@@ -1,6 +1,7 @@
 import os
 import logging
 from typing import List
+from collections import OrderedDict
 
 from torch.nn.functional import softmax
 from torch import Tensor
@@ -18,10 +19,13 @@ class StressPredictor:
         model_name: str = "IlyaGusev/ru-word-stress-transformer",
         revision: str = "b44e211",
         device: str = "cpu",
-        stress_dict_path: str = None
+        stress_dict_path: str = None,
+        cache_capacity: int = 100000
     ):
         self.model = StressModel(model_name, device=device, revision=revision)
         self.stress_dict = None
+        self.cache = OrderedDict()
+        self.cache_capacity = cache_capacity
         if stress_dict_path:
             self.stress_dict = StressDict()
             self.stress_dict.load(stress_dict_path)
@@ -44,11 +48,19 @@ class StressPredictor:
                 dict_record = self.stress_dict.get(word, Stress.Type.PRIMARY)
                 stresses[word] = dict_record
 
+            if word in self.cache:
+                self.cache.move_to_end(word)
+                stresses[word] = self.cache.get(word)
+
         unk_words = [word for word in words if word not in stresses]
         if not unk_words:
             return [stresses[word] for word in words]
         results = self.model.predict(unk_words, schema, batch_size=batch_size)
-        stresses.update({word: word_stresses for word, word_stresses in zip(unk_words, results)})
+        for word, word_stresses in zip(unk_words, results):
+            self.cache[word] = word_stresses
+            stresses[word] = word_stresses
+            if len(self.cache) > self.cache_capacity:
+                self.cache.popitem(last=False)
         return [stresses[word] for word in words]
 
     def predict(self, word: str, schema: PredictSchema = PredictSchema.CONSTRAINED):

@@ -38,3 +38,9 @@ class TestStressPredictor(unittest.TestCase):
             predicted = list(sorted(predicted))
             target = list(sorted(pos))
             self.assertEqual(predicted, target, msg="{}: {} vs {}".format(word, predicted, target))
+        words = list(checks.keys())
+        stresses = self.model.predict_words(words, schema=PredictSchema.CLASSIC)
+        for word, predicted in zip(words, stresses):
+            predicted = list(sorted(predicted))
+            target = list(sorted(checks[word]))
+            self.assertEqual(predicted, target, msg="{}: {} vs {}".format(word, predicted, target))
