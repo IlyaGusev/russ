@@ -48,7 +48,7 @@ class StressPredictor:
         if not unk_words:
             return [stresses[word] for word in words]
         results = self.model.predict(unk_words, schema, batch_size=batch_size)
-        stresses = {word: word_stresses for word, word_stresses in zip(unk_words, results)}
+        stresses.update({word: word_stresses for word, word_stresses in zip(unk_words, results)})
         return [stresses[word] for word in words]
 
     def predict(self, word: str, schema: PredictSchema = PredictSchema.CONSTRAINED):
